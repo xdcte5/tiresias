@@ -90,14 +90,41 @@ paths.
 
 ## How to run
 
-*(Filled in per sprint as the pipeline lands.)*
+### The whole thing, with zero captures (synthetic demo)
 
-- **Capture flows to disk** — `tiresias-capture --iface <if> --seconds 60` (Sprint 1)
-- **Build a synthetic dataset** — `tiresias-synth --sessions 40 --out data/synth` (Sprint 2)
-- **Build a labeled dataset from captures** — `tiresias-build-dataset` (Sprint 2)
-- **Train + evaluate the baseline** — `tiresias-train` (Sprint 3)
-- **Run the live backend** — `tiresias-serve` (Sprint 4)
-- **Run the dashboard** — `cd dashboard && npm install && npm run dev` (Sprint 5)
+```bash
+pip install -e ".[dev]"
+tiresias-synth --sessions 40 --out data/datasets/synth.parquet   # 1. build a dataset
+tiresias-train --dataset data/datasets/synth.parquet             # 2. train + eval report
+tiresias-serve --source synthetic                                # 3. live backend on :8000
+cd dashboard && npm install && npm run dev                       # 4. dashboard on :5173
+```
+
+Open http://localhost:5173 — the flow table updates live over WebSocket and the
+bandwidth-by-class chart refreshes every couple of seconds.
+
+### With your own captured traffic (headline numbers)
+
+```bash
+sudo ./scripts/collect_session.sh wlan0 video_streaming 300      # run each app; see docs/dataset.md
+tiresias-build-dataset --flows-dir data/flows --out data/datasets/captured.parquet
+tiresias-train --dataset data/datasets/captured.parquet
+tiresias-serve --source live --iface wlan0                       # classify your real traffic live
+```
+
+### Individual commands
+
+| Command | What |
+|---------|------|
+| `tiresias-capture --pcap x.pcap --out data/flows/x.parquet` | Replay a pcap to flow dumps (no privileges) |
+| `tiresias-capture --iface wlan0 --seconds 60 --out …` | Live-capture flows (needs privileges) |
+| `tiresias-synth --sessions 40 --out …` | Generate a synthetic labeled dataset |
+| `tiresias-build-dataset --flows-dir data/flows --out …` | SNI-label captured flows into a dataset |
+| `tiresias-train --dataset …` | Train RF+LightGBM, write model + eval report |
+| `tiresias-serve --source {synthetic,pcap,live}` | Live scoring backend (WebSocket + REST) |
+
+The dashboard's backend URL defaults to `http://127.0.0.1:8000`; override with
+`VITE_API_BASE` (e.g. `VITE_API_BASE=http://host:8000 npm run dev`).
 
 ---
 
