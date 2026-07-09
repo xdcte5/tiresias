@@ -1,0 +1,36 @@
+# --- Captured traffic: NEVER commit (privacy + size) ---
+data/
+*.pcap
+*.pcapng
+*.cap
+# flow dumps
+**/flows/*.parquet
+**/flows/*.json
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# --- Node / dashboard ---
+node_modules/
+dashboard/dist/
+dashboard/.vite/
+*.local
+
+# --- Large model artifacts (keep only small committed ones under artifacts/) ---
+*.pt
+*.pth
+*.onnx
+
+# --- OS / editor ---
+.DS_Store
+.idea/
+.vscode/
+*.swp

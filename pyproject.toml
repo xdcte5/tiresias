@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tiresias"
+version = "0.1.0"
+description = "Encrypted-traffic application classifier using flow-level metadata (no payload inspection)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "xdcte5" }]
+keywords = ["network", "traffic-classification", "tls", "ja3", "machine-learning"]
+
+dependencies = [
+    "scapy>=2.5",
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "pyarrow>=14",
+    "scikit-learn>=1.4",
+    "joblib>=1.3",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "websockets>=12",
+    "pydantic>=2.6",
+]
+
+[project.optional-dependencies]
+# LightGBM is an optional headline-comparison model; RF (sklearn) is the always-available baseline.
+boost = ["lightgbm>=4.1"]
+# Sprint 6 sequence-model comparison.
+deep = ["torch>=2.2"]
+dev = ["pytest>=8.0", "ruff>=0.3", "pytest-asyncio>=0.23", "httpx>=0.27"]
+
+[project.scripts]
+tiresias-capture = "tiresias.scripts.capture_to_disk:main"
+tiresias-build-dataset = "tiresias.scripts.build_dataset:main"
+tiresias-train = "tiresias.scripts.train:main"
+tiresias-synth = "tiresias.scripts.gen_synthetic_dataset:main"
+tiresias-serve = "tiresias.api.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]
