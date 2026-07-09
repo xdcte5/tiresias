@@ -103,8 +103,25 @@ paths.
 
 ## Results
 
-*(Populated in Sprint 3 with real per-class precision/recall/F1, a confusion matrix,
-and per-flow inference latency, and in Sprint 6 with the RF-vs-CNN comparison.)*
+> The numbers below are on the **synthetic** demo dataset (`tiresias-synth`), which
+> exists to exercise the full pipeline end-to-end. Replace it with your own captured
+> sessions to produce the headline numbers you put on a resume — the code, split, and
+> report are identical. Full report: [`reports/eval_baseline.md`](reports/eval_baseline.md).
+
+Session-based 75/25 split, 8 classes, features = flow size/timing + TLS structure +
+raw packet sequence (**SNI and JA3 identity excluded** — no leakage):
+
+| Model | Accuracy | Macro F1 | Latency / flow (median) |
+|-------|----------|----------|-------------------------|
+| RandomForest (headline) | ~95.8% | ~0.95 | single-digit ms |
+| LightGBM | ~96.1% | ~0.96 | ~2–3 ms |
+
+Per-class metrics and a feature-group ablation (showing SNI/JA3 leakage handling) are
+in the report. The model confuses `web_browsing` ↔ `music_streaming` most — both are
+bursty, download-leaning TLS flows — while `gaming`, `vpn`, `dns_background`, and
+`file_transfer` are near-perfectly separated.
+
+![confusion matrix](reports/confusion_rf.png)
 
 ---
 

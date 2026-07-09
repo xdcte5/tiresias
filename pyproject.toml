@@ -23,6 +23,7 @@ dependencies = [
     "uvicorn[standard]>=0.29",
     "websockets>=12",
     "pydantic>=2.6",
+    "matplotlib>=3.8",
 ]
 
 [project.optional-dependencies]
